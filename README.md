@@ -1,13 +1,9 @@
-# Sample Hardhat Project
+# Reaction Time Betting DApp
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+## Description
 
-Try running some of the following tasks:
+Decentralized application (DApp) built on the Ethereum blockchain. It allows users to wager Ether (ETH) on their ability to achieve a certain reaction time. The DApp is implemented using Solidity for the smart contract, Ethers.js for interacting with the Ethereum network, and React.js with Vite for the front end. The development and testing environment is set up using Hardhat.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
-```
+## Purpose
+
+To learn more about blockchain technology and writing smart contracts while simultanously practicing front-end development with react.

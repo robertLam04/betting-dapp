@@ -1,0 +1,120 @@
+.timer-container {
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.timer-container h1 {
+  font-size: 2em;
+  color: #333;
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.button:active {
+  background-color: #00408d;
+}
+
+.button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+#blockie-container {
+  position: relative; 
+  width: 75px; 
+  height: 75px;
+  margin: 20px auto; 
+}
+
+#blockie-container img {
+  position: absolute;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  width: 75px; 
+  height: 75px; 
+}
+
+.unselectable {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.countdown {
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.account {
+  position: fixed;
+  top: 20px;
+  right: 50px;
+  display: inline-block;
+}
+
+.address-tooltip {
+  visibility: hidden;
+  color: #fff;
+  border-radius: 5px;
+  padding: 5px;
+  z-index: 1;
+  top: 85%;
+  right: 150%;
+  transform: translateX(-50%);
+  margin-left: -50px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  width: 100px;
+  font-size: 9.5px
+}
+
+.account:hover .address-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.ReactionTimeButton {
+  width: 200px;
+  height: 200px;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.red {
+  background-color: red;
+  color: white;
+}
+
+.green {
+  background-color: green;
+  color: white;
+}

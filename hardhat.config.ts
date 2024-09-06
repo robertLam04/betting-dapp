@@ -1,16 +1,15 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("@nomicfoundation/hardhat-ignition");
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
 require("dotenv").config({ path: './client/.env' });
 
-//MAY HAVE BROKEN THIS BY MOVING .env out of root
-
-/** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
+const config: HardhatUserConfig = {
   solidity: "0.8.24",
   networks: {
     sepolia: {
       url: process.env.VITE_INFURA_URL,
-      accounts: [`0x${process.env.VITE_PRIVATE_KEY}`]
-    }
-  }
+      accounts: [`0x${process.env.VITE_PRIVATE_KEY}`],
+    },
+  },
 };
+
+export default config;

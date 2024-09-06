@@ -12,6 +12,11 @@
             - Maybe ban from using Dapp
         - Transactions only occur if the game was accepted
         - Safe (contract holds the funds)
+ - Maybe ban addresses that commit to games and fail to deposit
+
+
+ - ISSUE: if one person deposits and the other doesnt how will they get their
+          funds back
 
 */
 pragma solidity >=0.8.2 <0.9.0;

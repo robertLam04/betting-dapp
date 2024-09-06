@@ -1,11 +1,8 @@
 import {
-  time,
   loadFixture,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import hre from "hardhat";
-import { ethers } from "ethers";  // Import ethers directly
 import { Timing_game } from "../typechain-types";
 
 describe("TimingGame", function () {
@@ -13,7 +10,7 @@ describe("TimingGame", function () {
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deployTimingGameFixture() {
-    const INITIAL_FUNDS = ethers.parseEther("10");
+    const INITIAL_FUNDS = hre.ethers.parseEther("10");
 
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.ethers.getSigners();

@@ -1,12 +1,16 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.6",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.6"
+    "ethers": "^6.13.2",
+    "hardhat": "^2.22.8",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
     "ethereum-blockies-base64": "^1.0.2",
-    "ethers": "^6.13.1"
+    "google-auth-library": "^9.13.0",
+    "googleapis": "^140.0.1"
   }
 }

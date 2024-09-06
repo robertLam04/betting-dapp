@@ -139,7 +139,7 @@ describe("ReactionTime1v1", function () {
       expect(await reaction_time_1v1.connect(challenger).deposit({ value: wager })).to.emit(reaction_time_1v1, "PaymentTransfered").withArgs(wager, challenger)
 
       const game = await reaction_time_1v1.games(challenger.address);
-      expect(game.payed).to.be.true;
+      expect(game.paid).to.be.true;
     });
 
     it("Should revert if there is no committed game for the sender", async function () {
@@ -234,7 +234,7 @@ describe("ReactionTime1v1", function () {
     
       // Attempt to payout
       await expect(reaction_time_1v1.connect(owner).payoutWinner(challenger.address))
-        .to.be.revertedWith("The wager has not yet been payed by both players");
+        .to.be.revertedWith("The wager has not yet been paid by both players");
     });
 
   })

@@ -2,22 +2,17 @@ import React, { useEffect } from 'react';
 import makeBlockie from 'ethereum-blockies-base64';
 import notConnectedImg from '../assets/not_connected.png';
 import './styles.css';
+import { ethers } from 'ethers';
 
-interface AccountProps {
-  address: string | undefined;
-}
+//Or just make an actual address class
 
-const Account: React.FC<AccountProps> = ({ address }) => {
+const AccountBlockie: React.FC<{address: ethers.AddressLike}> = ({ address }) => {
 
   useEffect(() => {
     const imgContainer = document.getElementById('blockie-container');
     if (imgContainer) {
-      const img = new Image();
-      if (address) {
-        img.src = makeBlockie(address);
-      } else {
-        img.src = notConnectedImg;
-      }
+      const img = new Image()
+      img.src = makeBlockie(address.toString());
       imgContainer.innerHTML = '';
       imgContainer.appendChild(img); 
     }
@@ -28,11 +23,11 @@ const Account: React.FC<AccountProps> = ({ address }) => {
       <div id='blockie-container' className='blockie-container'></div>
       {address && (
         <div className='address-tooltip'>
-          {address}
+          {address.toString()}
         </div>
       )}
     </div>
   )
 }
 
-export default Account;
+export default AccountBlockie;

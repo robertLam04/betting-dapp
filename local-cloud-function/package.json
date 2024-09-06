@@ -1,0 +1,19 @@
+{
+  "name": "cloud-function",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "FUNCTION_TARGET=inviteMap FUNCTION_SIGNATURE_TYPE=http npx functions-framework"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.4.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "googleapis": "^142.0.0"
+  }
+}

@@ -3,11 +3,11 @@ import useCountdown from '../hooks/useCountdown';
 import useTimer from '../hooks/useTimer';
 import { ethers } from 'ethers';
 
-interface GameProps {
+interface ReactionTimeProps {
   handlePayouts: () => Promise<number | undefined>;
 }
 
-const ReactionTimeGame: React.FC<GameProps> = ({ handlePayouts }) => {
+const ReactionTime: React.FC<ReactionTimeProps> = ({ handlePayouts }) => {
   const [countdownPaused, setCountdownPaused] = useState<boolean>(false);
   const [buttonMessage, setButtonMessage] = useState<string>('Click when turns green');
   const [reactionTime, setReactionTime] = useState<number>();
@@ -87,4 +87,4 @@ const ReactionTimeGame: React.FC<GameProps> = ({ handlePayouts }) => {
   );
 };
 
-export default ReactionTimeGame;
+export default ReactionTime;

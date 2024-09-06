@@ -12,7 +12,7 @@ const Wager: React.FC<WagerProps> = ({ onWagerSubmit }) => {
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  const isInteger = (value: string): boolean => {
+  const isPosInteger = (value: string): boolean => {
     const regex = /^(?!0(\.0+)?$)(?:[1-9]\d*|0?\.\d*[1-9]\d*)$/;
     return regex.test(value);
   }
@@ -38,7 +38,7 @@ const Wager: React.FC<WagerProps> = ({ onWagerSubmit }) => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    if (isInteger(value)) {
+    if (isPosInteger(value)) {
       setWager(value);
     } else {
       setWager(null);

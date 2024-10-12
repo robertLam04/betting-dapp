@@ -4,8 +4,6 @@ import notConnectedImg from '../assets/not_connected.png';
 import './styles.css';
 import { ethers } from 'ethers';
 
-//Or just make an actual address class
-
 const AccountBlockie: React.FC<{address: ethers.AddressLike}> = ({ address }) => {
 
   useEffect(() => {

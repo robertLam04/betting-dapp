@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react';
 import useCountdown from '../hooks/useCountdown';
 import useTimer from '../hooks/useTimer';
-import { ethers } from 'ethers';
 
 interface ReactionTimeProps {
-  handlePayouts: () => Promise<number | undefined>;
+  onGameOver: (reactionTime: number) => Promise<number | undefined>;
 }
 
-const ReactionTime: React.FC<ReactionTimeProps> = ({ handlePayouts }) => {
+const ReactionTime: React.FC<ReactionTimeProps> = ({ onGameOver }) => {
   const [countdownPaused, setCountdownPaused] = useState<boolean>(false);
   const [buttonMessage, setButtonMessage] = useState<string>('Click when turns green');
-  const [reactionTime, setReactionTime] = useState<number>();
-  const [payout, setPayout] = useState<string>();
+  const [reactionTime, setReactionTime] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [won, setWon] = useState<boolean>();
-  const [loadingPayout, setLoadingPayout] = useState<boolean>(false);
  
   const onCountDownEnd = () => {
     setButtonMessage('Click!');
@@ -38,9 +34,10 @@ const ReactionTime: React.FC<ReactionTimeProps> = ({ handlePayouts }) => {
     }
 
     stopTimer();
+    const finalReactionTime = time * 1000;
+    setReactionTime(finalReactionTime);
+    setButtonMessage(`${finalReactionTime.toFixed(0)} ms`);
     setGameOver(true);
-    setReactionTime(time * 1000);
-    setButtonMessage((time * 1000).toFixed(0) + ' ms');
 
   }
 
@@ -56,20 +53,9 @@ const ReactionTime: React.FC<ReactionTimeProps> = ({ handlePayouts }) => {
   const {time, isRunning : timerRunning, startTimer, stopTimer} = useTimer();
 
   useEffect(() => {
-    const processPayout = async () => {
-      const payout = await handlePayouts();
-      if (payout) {setPayout(ethers.formatEther(payout));}
-      setLoadingPayout(false);
-    };
-
-    if (reactionTime && reactionTime <= 350.0) {
-      setWon(true);
-      setLoadingPayout(true);
-      processPayout();
-    } else {
-      setWon(false);
+    if (gameOver) {
+      onGameOver(reactionTime);
     }
-
   }, [reactionTime]);
 
   return (
@@ -80,9 +66,6 @@ const ReactionTime: React.FC<ReactionTimeProps> = ({ handlePayouts }) => {
       <button disabled={gameOver} onClick={handleClick} className={`ReactionTimeButton ${timerRunning ? 'green' : 'red'}`}>
         {buttonMessage}
       </button>
-      {gameOver && won !== undefined ? (won ? <p>You won</p> : <p>You lost</p>) : null}
-      {loadingPayout && <p>Seding ETH... please wait</p>}
-      {gameOver && payout && <p>{payout.toString()} ETH has been transfered to your wallet</p>}
     </div>
   );
 };

@@ -4,6 +4,7 @@ type UseInviteMapReturn = {
   addInvite: (invite: GameInvite) => Promise<string>;
   deleteInvite: (invite: GameInvite) => Promise<string>;
   getInvites: (key: string) => Promise<GameInvite[] | undefined>;
+  updateStatus: (invite: GameInvite) => Promise<string>
   getNonce: () => Promise<number | undefined>;
 };
 
@@ -94,6 +95,38 @@ const useInviteMap = (): UseInviteMapReturn => {
     }
   };
 
+  const updateStatus = async (invite: GameInvite): Promise<string> => {
+    try {
+      const options: RequestInit = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        //Don't know how to serialize a bigint error
+        body: JSON.stringify({
+          action: 'updateStatus',
+          from: invite.fromAddress,
+          to: invite.toAddress,
+          wager: invite.wager,
+          nonce: invite.nonce,
+          newStatus: invite.status
+        }),
+      };
+
+      const response = await fetch(cloudFunctionUrl, options);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.text();
+      return data;
+    } catch (error) {
+      console.error('Error updating status:', error);
+      throw error;
+    }
+  }
+
   const getNonce = async (): Promise<number | undefined> => {
     try {
       const url = new URL(cloudFunctionUrl);
@@ -121,10 +154,20 @@ const useInviteMap = (): UseInviteMapReturn => {
     }
   }
 
+  const getTimes = async (invite: GameInvite): Promise<[number, number]> => {
+    
+    const time1: number = 1.23;  
+    const time2: number = 4.56;  
+
+    
+    return [time1, time2];
+  }
+
   return {
     addInvite,
     deleteInvite,
     getInvites,
+    updateStatus,
     getNonce
   };
 

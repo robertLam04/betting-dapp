@@ -71,9 +71,7 @@ const SoloGame: React.FC<GameProps> = ({ accountAddress, contract, ownerContract
       {!countdownComplete && isReady && (
         <Countdown time={3} onCountdownEnd={handleCountdownEnd} />
       )}
-      {countdownComplete && (
-        <ReactionTime handlePayouts={handlePayouts} />
-      )}
+      
     </div>
   );
 }

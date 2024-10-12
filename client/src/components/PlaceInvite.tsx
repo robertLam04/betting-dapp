@@ -71,6 +71,7 @@ const PlaceInvite: React.FC<InviteProps> = ({ inviteAddress, setInviteAddress, w
 
   return (
     <div>
+      <h4>Send an invite:</h4>
       <div>
 
         {!wagerSubmitted &&

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { ethers } from 'ethers';
-import abi from '../../artifacts/contracts/timing_game.sol/timing_game.json';
+import abi from '../../artifacts/contracts/reaction_time_1v1.sol/reaction_time_1v1.json';
 import AccountBlockie from './components/AccountBlockie';
-import SoloGame from './components/SoloGame';
 import DuoGame from './components/DuoGame';
 
 const App: React.FC = () => {

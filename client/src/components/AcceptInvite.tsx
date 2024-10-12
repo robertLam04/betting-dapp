@@ -13,21 +13,26 @@ const AcceptInvite: React.FC<AcceptInviteProps> = ({ accountAddress, onAcceptInv
   const [invites, setInvites] = useState<GameInvite[]>([]);
   const [isPanelVisible, setIsPanelVisible] = useState<boolean>(false); // State to control panel visibility
 
-  // Function to handle the refresh button click
   const handleRefresh = async () => {
     try {
       const fetchedInvites = await getInvites(accountAddress.toString());
-      setInvites(fetchedInvites || []); // Handle undefined
+      const filteredInvites = (fetchedInvites || []).filter(
+        (invite) => invite.toAddress === accountAddress
+      );
+      setInvites(filteredInvites);
       console.log('Invites fetched:', fetchedInvites);
     } catch (error) {
       console.error('Error fetching invites:', error);
     }
   };
 
-  // Function to toggle the panel visibility
   const togglePanel = () => {
     setIsPanelVisible((prev) => !prev);
   };
+
+  useEffect(() => {
+    handleRefresh();
+  }, [])
 
   return (
     <div>

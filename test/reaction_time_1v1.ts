@@ -5,7 +5,7 @@ import {
   import hre from "hardhat";
 import { Reaction_time_1v1 } from "../typechain-types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { getNumber } from "ethers";
+import { ethers, getNumber } from "ethers";
 
 async function prepareCommitGame(reaction_time_1v1: Reaction_time_1v1, challenger: HardhatEthersSigner, acceptor: HardhatEthersSigner, wager: bigint, nonce: number) {
   const messageHash = hre.ethers.solidityPackedKeccak256(
@@ -59,7 +59,7 @@ describe("ReactionTime1v1", function () {
   
       await expect(
         reaction_time_1v1.commitGame(challenger.address, acceptor.address, wager, nonce, challengerSignature, acceptorSignature)
-      ).to.emit(reaction_time_1v1, "NewGameCommited").withArgs(wager, challenger.address, acceptor.address);
+      ).to.emit(reaction_time_1v1, "NewGameCommitted").withArgs(challenger.address, acceptor.address, wager, nonce);
 
     });
   
@@ -140,6 +140,27 @@ describe("ReactionTime1v1", function () {
 
       const game = await reaction_time_1v1.games(challenger.address);
       expect(game.paid).to.be.true;
+    });
+
+    it("Should emit GameReady event if both players have successfully deposited", async function () {
+      const { reaction_time_1v1, challenger, acceptor } = await loadFixture(deployReactionTime1v1Fixture);
+      const wager = hre.ethers.parseEther("1");
+      const nonce = 1;
+
+      const { challengerSignature, acceptorSignature } = await prepareCommitGame(reaction_time_1v1, challenger, acceptor, wager, nonce);
+
+      await reaction_time_1v1.commitGame(challenger.address, acceptor.address, wager, nonce, challengerSignature, acceptorSignature);
+
+      await reaction_time_1v1.connect(challenger).deposit({ value: wager });
+      expect(await reaction_time_1v1.connect(acceptor).deposit({ value: wager })).to.emit(reaction_time_1v1, "GameReady")
+        .withArgs(
+          challenger.address, acceptor.address, wager, nonce
+        );
+      
+      const gameChallenger = await reaction_time_1v1.games(challenger.address);
+      const gameAcceptor = await reaction_time_1v1.games(acceptor.address);
+      expect(gameChallenger.paid).to.be.true;
+      expect(gameAcceptor.paid).to.be.true;
     });
 
     it("Should revert if there is no committed game for the sender", async function () {
@@ -237,5 +258,114 @@ describe("ReactionTime1v1", function () {
         .to.be.revertedWith("The wager has not yet been paid by both players");
     });
 
-  })
+    it("Should revert if the prize has already been payed out", async function () {
+      const { reaction_time_1v1, owner, challenger, acceptor } = await loadFixture(deployReactionTime1v1Fixture);
+      const wager = hre.ethers.parseEther("1");
+      const nonce = 1;
+    
+      // Prepare and commit the game
+      const { challengerSignature, acceptorSignature } = await prepareCommitGame(reaction_time_1v1, challenger, acceptor, wager, nonce);
+      await reaction_time_1v1.commitGame(challenger.address, acceptor.address, wager, nonce, challengerSignature, acceptorSignature);
+    
+      // Both players deposit their wagers
+      await reaction_time_1v1.connect(challenger).deposit({ value: wager });
+      await reaction_time_1v1.connect(acceptor).deposit({ value: wager });
+
+      
+      await reaction_time_1v1.connect(owner).payoutWinner(challenger.address);
+      
+      // Owner calls payoutWinner again
+      await expect(reaction_time_1v1.connect(owner).payoutWinner(challenger.address))
+        .to.be.revertedWith("This address is not apart of any commited games");
+    
+    });
+  });
+
+  describe("Withdraw", async function () {
+    it ("Should succesfully transfer the wager to the caller", async function () {
+      const { reaction_time_1v1, owner, challenger, acceptor } = await loadFixture(deployReactionTime1v1Fixture);
+      const wager = hre.ethers.parseEther("1");
+      const nonce = 1;
+      const timeoutPeriod = 1 * 60 * 60; // 1 hour timeout
+
+      // Prepare and commit the game
+      const { challengerSignature, acceptorSignature } = await prepareCommitGame(reaction_time_1v1, challenger, acceptor, wager, nonce);
+      await reaction_time_1v1.commitGame(challenger.address, acceptor.address, wager, nonce, challengerSignature, acceptorSignature);
+
+      // Only challenger deposits their wager
+      await reaction_time_1v1.connect(challenger).deposit({ value: wager });
+
+      // Move time forward by timeout + 1 second to trigger the timeout
+      await hre.network.provider.send("evm_increaseTime", [timeoutPeriod + 1]);
+      await hre.network.provider.send("evm_mine"); // Mine a block to reflect the time increase
+
+       // Get challenger's balance before calling withdraw
+      const challengerBalanceBefore = await hre.ethers.provider.getBalance(challenger.address);
+
+      // Challenger calls withdraw
+      const tx = await reaction_time_1v1.connect(challenger).withdraw();
+
+      const receipt = await tx.wait();
+
+      if (!receipt) {
+        throw new Error("Transaction receipt is null");
+      }
+
+      // Get the gas cost for the transaction
+      const gasUsed = receipt.gasUsed;
+      const gasPrice = tx.gasPrice;
+      const gasCost = gasUsed * gasPrice;
+
+      // Get challenger's balance after calling withdraw
+      const challengerBalanceAfter = await hre.ethers.provider.getBalance(challenger.address);
+
+      // The challenger's balance should increase by the wager minus the gas cost
+      expect(challengerBalanceAfter).to.equal(challengerBalanceBefore + wager - gasCost);
+      await expect(tx).to.emit(reaction_time_1v1, "BetWithdrawn").withArgs(challenger.address, wager);
+    });
+
+    it("Should revert if the timeout period hasn't passed", async function () {
+      const { reaction_time_1v1, owner, challenger, acceptor } = await loadFixture(deployReactionTime1v1Fixture);
+      const wager = hre.ethers.parseEther("1");
+      const nonce = 1;
+      const timeoutPeriod = 1 * 60 * 60; // 1 hour timeout
+
+      // Prepare and commit the game
+      const { challengerSignature, acceptorSignature } = await prepareCommitGame(reaction_time_1v1, challenger, acceptor, wager, nonce);
+      await reaction_time_1v1.commitGame(challenger.address, acceptor.address, wager, nonce, challengerSignature, acceptorSignature);
+
+      // Only challenger deposits their wager
+      await reaction_time_1v1.connect(challenger).deposit({ value: wager });
+
+      // Get challenger's balance before calling withdraw
+      const challengerBalanceBefore = await hre.ethers.provider.getBalance(challenger.address);
+
+      // Challenger calls withdraw
+      await expect(reaction_time_1v1.connect(challenger).withdraw())
+        .to.be.revertedWith("The timeout period has not yet passed");
+    });
+
+    it("Should revert if the timeout period hasn't passed", async function () {
+      const { reaction_time_1v1, owner, challenger, acceptor } = await loadFixture(deployReactionTime1v1Fixture);
+      const wager = hre.ethers.parseEther("1");
+      const nonce = 1;
+      const timeoutPeriod = 1 * 60 * 60; // 1 hour timeout
+
+      // Prepare and commit the game
+      const { challengerSignature, acceptorSignature } = await prepareCommitGame(reaction_time_1v1, challenger, acceptor, wager, nonce);
+      await reaction_time_1v1.commitGame(challenger.address, acceptor.address, wager, nonce, challengerSignature, acceptorSignature);
+
+      // Only challenger deposits their wager
+      await reaction_time_1v1.connect(challenger).deposit({ value: wager });
+
+      // Get challenger's balance before calling withdraw
+      const challengerBalanceBefore = await hre.ethers.provider.getBalance(challenger.address);
+
+      // Challenger calls withdraw
+      await expect(reaction_time_1v1.connect(challenger).withdraw())
+        .to.be.revertedWith("The timeout period has not yet passed");
+      
+    });
+  });
+
 });
